@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Modern Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Modern clean typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation / Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="brand">
+                    <span class="brand-icon">✓</span>
+                    <h1>TaskFlow</h1>
+                </div>
+                <!-- Preserves DevOps Welcome Banner for compatibility and CI testing -->
+                <p class="devops-badge">Welcome to My First DevOps Project!</p>
+            </div>
+            <div class="header-right">
+                <a href="/health" class="health-pill" target="_blank" title="Check application health status">
+                    <span class="status-dot"></span> System: Healthy
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content Layout -->
+        <main class="app-main">
+            <!-- Add Task Form Card -->
+            <section class="card form-card">
+                <h2>Create New Task</h2>
+                <form id="add-task-form">
+                    <div class="form-group">
+                        <label for="task-title">Title <span class="required">*</span></label>
+                        <input type="text" id="task-title" name="title" placeholder="What needs to be done?" maxlength="200" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-desc">Description (optional)</label>
+                        <textarea id="task-desc" name="description" placeholder="Add extra details, notes or links..." rows="2" maxlength="1000"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="add-task-btn">
+                            <span class="btn-text">+ Add Task</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Tasks Dashboard Section -->
+            <section class="card list-card">
+                <div class="list-header">
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">
+                            All <span class="count-badge" id="count-all">0</span>
+                        </button>
+                        <button class="filter-tab" data-filter="pending">
+                            Pending <span class="count-badge" id="count-pending">0</span>
+                        </button>
+                        <button class="filter-tab" data-filter="completed">
+                            Completed <span class="count-badge" id="count-completed">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Toast Notification Container -->
+                <div id="toast-message" class="toast hidden"></div>
+
+                <!-- Task List Container -->
+                <div id="task-list" class="task-list">
+                    <!-- Tasks rendered dynamically via JS -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state hidden">
+                    <div class="empty-icon">📋</div>
+                    <h3>No tasks found</h3>
+                    <p id="empty-state-text">You're all caught up! Create a new task above.</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Edit Task Modal -->
+        <div id="edit-modal" class="modal hidden">
+            <div class="modal-backdrop"></div>
+            <div class="modal-dialog">
+                <div class="modal-header">
+                    <h3>Edit Task</h3>
+                    <button type="button" class="btn-close" id="close-modal">&times;</button>
+                </div>
+                <form id="edit-task-form">
+                    <input type="hidden" id="edit-task-id">
+                    <div class="form-group">
+                        <label for="edit-task-title">Title <span class="required">*</span></label>
+                        <input type="text" id="edit-task-title" maxlength="200" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-task-desc">Description</label>
+                        <textarea id="edit-task-desc" rows="3" maxlength="1000"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>TaskFlow &bull; Powered by Flask, SQLite &amp; Docker &bull; DevOps CI/CD Enabled</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
