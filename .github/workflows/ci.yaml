@@ -61,6 +61,12 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/flask-devops-app:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/flask-devops-app:${{ github.sha }}
 
+      - name: Display GitHub repository identifiers
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Owner ID: ${{ github.repository_owner_id }}"
+          echo "Repository ID: ${{ github.repository_id }}"
       - name: Configure AWS credentials
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: aws-actions/configure-aws-credentials@v4
