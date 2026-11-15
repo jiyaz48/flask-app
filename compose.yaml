@@ -1,0 +1,28 @@
+services:
+  flask-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devops-flask-app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 128M
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
