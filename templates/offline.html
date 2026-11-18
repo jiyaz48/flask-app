@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Offline</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#4f46e5">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="brand">
+                <span class="brand-icon">✓</span>
+                <h1>TaskFlow</h1>
+            </div>
+            <span class="status-badge pending">Offline Mode</span>
+        </header>
+
+        <main class="app-main">
+            <section class="card" style="text-align: center; padding: 48px 20px;">
+                <div style="font-size: 3rem; margin-bottom: 16px;">📡</div>
+                <h2>You are currently offline</h2>
+                <p style="color: var(--gray-600); max-width: 480px; margin: 12px auto 24px;">
+                    TaskFlow requires an internet connection to create, edit, or delete tasks.
+                </p>
+                <button type="button" class="btn btn-primary" onclick="window.location.reload()">
+                    🔄 Try Reconnecting
+                </button>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>TaskFlow PWA &bull; Offline Fallback</p>
+        </footer>
+    </div>
+</body>
+</html>

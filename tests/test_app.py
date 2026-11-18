@@ -195,3 +195,71 @@ def test_task_not_found(client):
     assert client.put("/api/tasks/9999", json={"title": "X"}).status_code == 404
     assert client.patch("/api/tasks/9999/toggle").status_code == 404
     assert client.delete("/api/tasks/9999").status_code == 404
+
+
+# -------------------------------------------------------------------------
+# Progressive Web App (PWA) Tests
+# -------------------------------------------------------------------------
+
+def test_manifest_accessibility_and_content(client):
+    """
+    Tests that the web app manifest is served with the correct MIME type
+    and conforms to PWA specification requirements.
+    """
+    response = client.get("/manifest.webmanifest")
+    assert response.status_code == 200
+    assert "application/manifest+json" in response.headers["Content-Type"]
+
+    data = response.get_json()
+    assert data is not None
+    assert data["name"] == "TaskFlow"
+    assert data["short_name"] == "TaskFlow"
+    assert data["start_url"] == "/"
+    assert data["display"] == "standalone"
+    assert data["theme_color"] == "#4f46e5"
+    assert data["background_color"] == "#f8fafc"
+    assert data["orientation"] == "portrait-primary"
+
+    # Verify icons exist in manifest and have required sizes
+    assert "icons" in data
+    assert len(data["icons"]) >= 2
+
+    sizes = [icon["sizes"] for icon in data["icons"]]
+    assert "192x192" in sizes
+    assert "512x512" in sizes
+
+    purposes = [icon.get("purpose") for icon in data["icons"]]
+    assert "maskable" in purposes
+
+
+def test_service_worker_accessibility_and_headers(client):
+    """
+    Tests that /sw.js is served with correct JavaScript MIME type and
+    the Service-Worker-Allowed header allowing root scope.
+    """
+    response = client.get("/sw.js")
+    assert response.status_code == 200
+    assert "application/javascript" in response.headers["Content-Type"]
+    assert response.headers.get("Service-Worker-Allowed") == "/"
+    assert b"taskflow-shell-v1" in response.data
+
+
+def test_offline_page_accessibility(client):
+    """
+    Tests that the offline fallback page is accessible and contains TaskFlow branding.
+    """
+    response = client.get("/offline")
+    assert response.status_code == 200
+    assert b"TaskFlow" in response.data
+    assert b"offline" in response.data.lower()
+
+
+def test_pwa_icons_accessibility(client):
+    """
+    Tests that the PWA PNG icons are accessible via static routes.
+    """
+    for icon_name in ["icon-192.png", "icon-512.png", "icon-maskable-192.png", "icon-maskable-512.png"]:
+        res = client.get(f"/static/icons/{icon_name}")
+        assert res.status_code == 200
+        assert res.headers["Content-Type"] == "image/png"
+        assert len(res.data) > 0

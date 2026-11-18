@@ -2,8 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TaskFlow - Modern Task Manager</title>
+
+    <!-- PWA Web App Manifest and Theme Configuration -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TaskFlow">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Modern clean typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +22,12 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Offline Status Warning Bar -->
+        <div id="offline-indicator" class="offline-indicator hidden" role="alert">
+            <span class="offline-icon">⚠️</span>
+            <span>You are currently offline. TaskFlow requires an internet connection to create, edit, or delete tasks.</span>
+        </div>
+
         <!-- Top Navigation / Header -->
         <header class="app-header">
             <div class="header-left">
@@ -23,6 +39,9 @@
                 <p class="devops-badge">Welcome to My First DevOps Project!</p>
             </div>
             <div class="header-right">
+                <button type="button" id="pwa-install-btn" class="btn btn-sm btn-install hidden" title="Install TaskFlow PWA">
+                    📲 Install App
+                </button>
                 <a href="/health" class="health-pill" target="_blank" title="Check application health status">
                     <span class="status-dot"></span> System: Healthy
                 </a>

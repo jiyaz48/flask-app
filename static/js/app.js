@@ -318,6 +318,102 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // -------------------------------------------------------------------------
+    // Progressive Web App (PWA) Features
+    // -------------------------------------------------------------------------
+
+    // 1. Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+            try {
+                const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+                console.log('TaskFlow Service Worker registered successfully with scope:', reg.scope);
+
+                // Detect when a new service worker version has installed
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('A new TaskFlow version is available.');
+                            }
+                        });
+                    }
+                });
+            } catch (err) {
+                console.warn('TaskFlow Service Worker registration failed:', err);
+            }
+        });
+    }
+
+    // 2. Install Prompt (beforeinstallprompt) Handling
+    let deferredPrompt = null;
+    const pwaInstallBtn = document.getElementById('pwa-install-btn');
+
+    // Detect if running in standalone PWA mode
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                         window.navigator.standalone === true;
+
+    if (isStandalone && pwaInstallBtn) {
+        pwaInstallBtn.classList.add('hidden');
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 76+ from automatically showing the prompt
+        e.preventDefault();
+        deferredPrompt = e;
+        // Only show custom install button if not already running standalone
+        if (!isStandalone && pwaInstallBtn) {
+            pwaInstallBtn.classList.remove('hidden');
+        }
+    });
+
+    if (pwaInstallBtn) {
+        pwaInstallBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                showToast("To install, open your browser menu and choose 'Add to Home Screen'.", "success");
+                return;
+            }
+            deferredPrompt.prompt();
+            const choiceResult = await deferredPrompt.userChoice;
+            if (choiceResult.outcome === 'accepted') {
+                showToast('Thank you for installing TaskFlow!', 'success');
+            }
+            deferredPrompt = null;
+            pwaInstallBtn.classList.add('hidden');
+        });
+    }
+
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        if (pwaInstallBtn) pwaInstallBtn.classList.add('hidden');
+        showToast('TaskFlow was installed successfully!', 'success');
+    });
+
+    // 3. Online/Offline Connection Monitoring
+    const offlineIndicator = document.getElementById('offline-indicator');
+    function updateOnlineStatus() {
+        if (!offlineIndicator) return;
+        if (navigator.onLine) {
+            offlineIndicator.classList.add('hidden');
+        } else {
+            offlineIndicator.classList.remove('hidden');
+        }
+    }
+
+    window.addEventListener('online', () => {
+        updateOnlineStatus();
+        showToast('Connection restored! Refreshing tasks...', 'success');
+        loadTasks();
+    });
+
+    window.addEventListener('offline', () => {
+        updateOnlineStatus();
+        showToast('You are currently offline. TaskFlow requires an internet connection to create, edit, or delete tasks.', 'error');
+    });
+
+    updateOnlineStatus();
+
     // Initial load
     loadTasks();
 });

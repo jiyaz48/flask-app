@@ -1,7 +1,7 @@
 from contextlib import closing
 import os
 import sqlite3
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, make_response, render_template, request, send_from_directory
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -83,6 +83,41 @@ def health():
         status="healthy",
         message="Application is running smoothly"
     ), 200
+
+
+# -------------------------------------------------------------------------
+# PWA Routes (Manifest, Service Worker & Offline Fallback)
+# -------------------------------------------------------------------------
+
+@app.route("/manifest.webmanifest", methods=["GET"])
+def manifest():
+    """
+    Exposes the Web App Manifest with application/manifest+json MIME type.
+    """
+    response = make_response(send_from_directory("static", "manifest.webmanifest"))
+    response.headers["Content-Type"] = "application/manifest+json"
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
+
+
+@app.route("/sw.js", methods=["GET"])
+def service_worker():
+    """
+    Exposes the Service Worker at root scope with Service-Worker-Allowed header.
+    """
+    response = make_response(send_from_directory(os.path.join("static", "js"), "sw.js"))
+    response.headers["Content-Type"] = "application/javascript"
+    response.headers["Service-Worker-Allowed"] = "/"
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
+
+
+@app.route("/offline", methods=["GET"])
+def offline():
+    """
+    Renders the offline fallback page for PWA.
+    """
+    return render_template("offline.html")
 
 
 # -------------------------------------------------------------------------
